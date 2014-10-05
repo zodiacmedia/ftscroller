@@ -45,12 +45,15 @@ Options must be specified at create-time by passing a JSON object as the second 
 * `bouncing` Allow scroll bouncing and elasticity near the ends of the range and at snap points _(boolean, default true)_
 * `contentWidth` Define the scrollable width; if not defined, this will match the content width _(numeric, default undefined)_
 * `contentHeight` Define the scrollable height; if not defined, this will match the content height _(numeric, default undefined)_
+* `disabledInputMethods` Define any input methods to disable; on some multi-input devices custom behaviour may be desired for some scrollers.  No inputs methods are disabled by default. _(object, default { mouse: false, touch: false, scroll: false })_
 * `enableRequestAnimationFrameSupport` FTScroller will use requestAnimationFrame on platforms which support it, which is highly recommended; however this can result in the animation being a further half-frame behind the input method, increasing perceived lag slightly.  To disable this, set this property to false. _(boolean, default true)_
+* `flinging` Allow a fast scroll to continue with momentum when released _(boolean, default true)_
 * `hwAccelerationClass` FTScroller uses normal translate properties rather than translate3d to position content when scrolling, and triggers hardware acceleration by adding CSS properties (specifically backface-visibility) to this class on platforms that support it.  Adjusting this class allows for negotiating complex CSS inheritance to override the default behaviour of FTScroller if you want to change or disable backing layers/3D acceleration. _(string, default an internal class which triggers backing layers)_
 * `maxFlingDuration` Set the maximum time (ms) that a fling can take to complete once the input has ended _(numeric, default 1000ms)_
 * `paginatedSnap` If snapping is enabled, restricts each scroll movement to one 'page' span.  That is, if set to true, it will not be possible to move more than one page in a single movement. _(boolean, default false)_
 * `scrollbars` Whether to display iOS-style scrollbars (which you can style yourself using `.ftscroller_scrollbar` and `.ftscroller_scrollbarx`/`.ftscroller_scrollbary`) while the content is animating _(boolean, default true)_
 * `scrollBoundary` The initial movement required to trigger a full scroll, in pixels; this is the point at which the scroll is exclusive to this particular FTScroller instance and flings become active _(integer, default 1)_
+* `scrollingClassName` The classname to add to the scroller container when it is being actively scrolled.  This is disabled by default as it can cause a CSS relayout if enabled, but allows custom styling in response to scrolls _(string, default not set)_
 * `scrollResponseBoundary` The initial movement required to trigger a visual scroll update, in pixels _(integer, default 1)_
 * `scrollingX` Enable scrolling on the X axis if content is available _(boolean, default true)_
 * `scrollingY` Enable scrolling on the Y axis if content is available _(boolean, default true)_
@@ -60,6 +63,9 @@ Options must be specified at create-time by passing a JSON object as the second 
 * `updateOnChanges` Automatically detect changes to the content of the scrollable element and update the scroller dimensions whenever the content changes. This is set to false automatically if `contentWidth` and `contentHeight` are specified _(boolean, default true)_
 * `updateOnWindowResize` Automatically catch changes to the window size and update the dimensions of the scroller.  It's advisable to set this to true if the scroller has a flexible width or height based on the viewport size. _(boolean, default false)_
 * `windowScrollingActiveFlag` Whether to use a global property of the window object to control whether to allow scrolling to start or not.  If the specified window property is set to a truthy value, the scroller will not react to input.  If the property is not truthy, the scroller will set it to itself and will scroll.  Where multiple scrollers exist on the same page, this ensures that only one can be used at a time, which is particularly useful for nested scrollers (see [Multiple vertical scrollers in a horizontally paged scroller](examples/galleryscrollers.html)).  Note that FTScroller automatically allows only one scroller instance to be scrolled at once; use this flag to coordinate input with other parts of your code. _(string, default not set)_
+* `flingBezier` The bezier curve to use for momentum-like flings. _(CubicBezier, default CubicBezier(0.103, 0.389, 0.307, 0.966))_
+* `bounceDecelerationBezier` The bezier curve to use for deceleration when a fling hits the bounds. _(CubicBezier, default CubicBezier(0, 0.5, 0.5, 1))_
+* `bounceBezier` The bezier curve to use for bouncebacks when the scroll exceeds the bounds. _(CubicBezier, default CubicBezier(0.7, 0, 0.9, 0.6))_
 
 ## Public interface
 
@@ -100,6 +106,8 @@ Events can be bound with the `addEventListener` method.  Events are fired syncro
 * `scrollend`  Fired when a scroll movement ends.  Passes an object with the same characteristics as `scroll`.
 * `segmentdidchange` Fires on completion of a scroll movement, if the scroller is on a different segment to the one it was on at the start of the movement.  Passes an object with `segmentX` and `segmentY` properties.
 * `segmentwillchange` Fires as soon as the scroll position crosses a segment boundary, during a scroll movement.  Passes an object with `segmentX` and `segmentY` properties.
+* `reachedstart` Fires when the scroll position reaches the top or left of a scroller.  Passes an object with an `axis` property indicating whether the `x` or `y` axis reached its start position.
+* `reachedend` Fires when the scroll position reaches the bottom or right of a scroller.  Passes an object with an `axis` property indicating whether the `x` or `y` axis reached its end position.
 
 ## Compatibility
 
