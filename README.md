@@ -1,6 +1,6 @@
 # FTScroller
 
-FTScroller is a library for adding momentum scrolling to web content on devices with a touch interface, compatible across most modern platforms including desktop browsers.  Although recently support for `overflow: scroll` (or touch equivalents) has increased, this is often still not implemented in a cross-platform or backwards-compatible way, and with no support for features like snapping.  
+FTScroller is a library for adding momentum scrolling to web content on devices with a touch interface, compatible across most modern platforms including desktop browsers.  Although recently support for `overflow: scroll` (or touch equivalents) has increased, this is often still not implemented in a cross-platform or backwards-compatible way, and with no support for features like snapping.
 
 FTScroller is developed by [FT Labs](http://labs.ft.com), part of the Financial Times.  It is inspired by [Touchscroll](https://github.com/davidaurelio/TouchScroll) and [Zynga Scroller](https://github.com/zynga/scroller), but is a complete rewrite.  It is extensively used in the [FT Web App](http://app.ft.com), and was developed to achieve better performance and compatibility, including mouse and touch input.
 
@@ -45,18 +45,18 @@ Options must be specified at create-time by passing a JSON object as the second 
 * `bouncing` Allow scroll bouncing and elasticity near the ends of the range and at snap points _(boolean, default true)_
 * `contentWidth` Define the scrollable width; if not defined, this will match the content width _(numeric, default undefined)_
 * `contentHeight` Define the scrollable height; if not defined, this will match the content height _(numeric, default undefined)_
-* `disabledInputMethods` Define any input methods to disable; on some multi-input devices custom behaviour may be desired for some scrollers.  No inputs methods are disabled by default. _(object, default { mouse: false, touch: false, scroll: false })_
+* `disabledInputMethods` Define any input methods to disable; on some multi-input devices custom behaviour may be desired for some scrollers.  No inputs methods are disabled by default. _(object, default { mouse: false, touch: false, scroll: false, pointer: false, focus: false })_
 * `enableRequestAnimationFrameSupport` FTScroller will use requestAnimationFrame on platforms which support it, which is highly recommended; however this can result in the animation being a further half-frame behind the input method, increasing perceived lag slightly.  To disable this, set this property to false. _(boolean, default true)_
 * `flinging` Allow a fast scroll to continue with momentum when released _(boolean, default true)_
 * `hwAccelerationClass` FTScroller uses normal translate properties rather than translate3d to position content when scrolling, and triggers hardware acceleration by adding CSS properties (specifically backface-visibility) to this class on platforms that support it.  Adjusting this class allows for negotiating complex CSS inheritance to override the default behaviour of FTScroller if you want to change or disable backing layers/3D acceleration. _(string, default an internal class which triggers backing layers)_
 * `maxFlingDuration` Set the maximum time (ms) that a fling can take to complete once the input has ended _(numeric, default 1000ms)_
-* `paginatedSnap` If snapping is enabled, restricts each scroll movement to one 'page' span.  That is, if set to true, it will not be possible to move more than one page in a single movement. _(boolean, default false)_
 * `scrollbars` Whether to display iOS-style scrollbars (which you can style yourself using `.ftscroller_scrollbar` and `.ftscroller_scrollbarx`/`.ftscroller_scrollbary`) while the content is animating _(boolean, default true)_
 * `scrollBoundary` The initial movement required to trigger a full scroll, in pixels; this is the point at which the scroll is exclusive to this particular FTScroller instance and flings become active _(integer, default 1)_
 * `scrollingClassName` The classname to add to the scroller container when it is being actively scrolled.  This is disabled by default as it can cause a CSS relayout if enabled, but allows custom styling in response to scrolls _(string, default not set)_
 * `scrollResponseBoundary` The initial movement required to trigger a visual scroll update, in pixels _(integer, default 1)_
 * `scrollingX` Enable scrolling on the X axis if content is available _(boolean, default true)_
 * `scrollingY` Enable scrolling on the Y axis if content is available _(boolean, default true)_
+* `singlePageScrolls` _(was `paginatedSnap`)_ If snapping is enabled, restricts each scroll movement to one 'page' span.  That is, if set to true, it will not be possible to move more than one page in a single movement. _(boolean, default false)_
 * `snapping` Enable snapping of content to defined 'pages' or segments _(boolean, default false)_
 * `snapSizeX` Define the horizontal interval content should snap to, in pixels.  If this is not set, snapping will be based on pages corresponding to the container size. _(numeric, default undefined)_
 * `snapSizeY` Define the vertical interval content should snap to, in pixels.  If this is not set, snapping will be based on pages corresponding to the container size. _(numeric, default undefined)_
@@ -90,11 +90,12 @@ Once the scroller has been applied to an element, the return value from the cons
 * `scrollTo(left, top[, duration])` Scroll to a specified left and top offet over a specified duration.  If duration is zero, no animation will occur.  If duration is `true` FTScroller will itself choose a duration based on the distance to be scrolled.  The left and top inputs will be constrained by the size of the content and the snap points.  If false is supplied for either left or top, that axis will not be scrolled and will retain its current offset.
 * `setSnapSize(width, height)` Configures the snapping boundaries within the scrolling element if snapping is active.  If this is never called, segment size defaults to the width and height of the scroller, ie. page-at-a-time.
 * `updateDimensions(width, height[, nosnap])` Sets the dimensions of the scrollable content.  If snapping is enabled, and you wish to disable updates of the snapping grid and prevent the current position from being updated, set `nosnap` to true; it defaults to false if not supplied.
+* `setDisabledInputMethods(disabledInputMethods)` Set the input methods to disable. No inputs methods are disabled by default. `(object, default { mouse: false, touch: false, scroll: false, pointer: false, focus: false })`
 
 ### Prototype methods
 
 * `getPrependedHTML([excludeXAxis, excludeYAxis, hwAccelerationClass])` - Provides half of the HTML that is used to construct the scroller DOM, for use to save a DOM manipulation on Scroller initialisation (see Tips and tricks below).  Optionally the x and y axes can be excluded, or a custom layer backing triggering class can be supplied (see the `hwAccelerationClass` option for the constructor).
-* `getAppendedHTML([excludeXAxis, excludeYAxis, hwAccelerationClass, scrollbars])` - Provides the second half of the HTML that is used to construct the scroller DOM, for use to save a DOM manipulation on Scroller initialisation (see Tips and tricks below).  Optionally the x and y axes can be excluded, or a custom layer backing triggering class can be supplied (see the `hwAccelerationClass` option for the constructor).  Pass a truthy value in for the `scrollbars` parameter if you are enabling scrolling.  _Any parameters should match those passed in to `getPrependedHTML`._ 
+* `getAppendedHTML([excludeXAxis, excludeYAxis, hwAccelerationClass, scrollbars])` - Provides the second half of the HTML that is used to construct the scroller DOM, for use to save a DOM manipulation on Scroller initialisation (see Tips and tricks below).  Optionally the x and y axes can be excluded, or a custom layer backing triggering class can be supplied (see the `hwAccelerationClass` option for the constructor).  Pass a truthy value in for the `scrollbars` parameter if you are enabling scrolling.  _Any parameters should match those passed in to `getPrependedHTML`._
 
 
 ### Events
@@ -121,7 +122,7 @@ FTScroller supports input via mouse or touch on the following browsers:
 
 ## Tips and tricks
 
-* If you are putting together the DOM in JavaScript using HTML or a template, it's advantageous to use the prototype methods for `getPrependedHTML` and `getAppendedHTML` to add the FTScroller HTML at the same time.  If the elements are added to the very start and very end of the content within the element passed in to the constructor (ignoring whitespace), the Scroller instatiation will detect this and skip the DOM manipulation step, leading to faster instantiation without an additional layout.
+* If you are putting together the DOM in JavaScript using HTML or a template, it's advantageous to use the prototype methods for `getPrependedHTML` and `getAppendedHTML` to add the FTScroller HTML at the same time.  If the elements are added to the very start and very end of the content within the element passed in to the constructor (ignoring whitespace), the Scroller instantiation will detect this and skip the DOM manipulation step, leading to faster instantiation without an additional layout.
 * If scrolling is going to only occur along one axis, setting `scrollingX` or `scrollingY` to `false` as part of the construction options skips creating of the corresponding DOM element, saving memory (particularly when using hardware acceleration).
 * Depending on your CSS, you may find that you can't scroll quite to the bottom of your content.  This is typically a **[collapsing margin](http://www.complexspiral.com/publications/uncollapsing-margins/)** issue — the contents are measured, then wrapped in additional elements, but the margins spilling _out_ of the contents can't be measured.  If you see this, an easy fix is typically to put `overflow: hidden` either your scrollable element or its contents; that will act as a boundary for margins so everything can be measured, and typically has no effect on appearance when applied to the content as the scrollable content won't have dimensional limits.
 
